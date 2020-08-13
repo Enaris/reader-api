@@ -4,10 +4,9 @@ using System.Text;
 
 namespace Reader.API.DataAccess.DbModels
 {
-    public class Options
+    public class OptionsLog
     {
         public Guid Id { get; set; }
-        public string Name { get; set; }
         public int InitialWPM { get; set; }
         public int InitialCPM { get; set; }
         public int TargetWPM { get; set; }
@@ -16,11 +15,10 @@ namespace Reader.API.DataAccess.DbModels
         public int SlowIfLonger { get; set; }
         public int AppendIfShorter { get; set; }
         public int MaxAppend { get; set; }
-        public int InitialAccelerationTimeSecs { get; set; }
+        public int InitialAccelaretionTimeSecs { get; set; }
         public int SlowTo { get; set; }
         public double AddPerMin { get; set; }
 
-        public Guid ReaderUserId { get; set; }
-        public ReaderUser ReaderUser { get; set; }
+        public ReadingSession ReadingSession { get; set; }
     }
 }

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Reader.API.DataAccess.Context;
 
 namespace Reader.API.DataAccess.Migrations
 {
     [DbContext(typeof(ReaderContext))]
-    partial class ReaderContextModelSnapshot : ModelSnapshot
+    [Migration("20200813040838_OptionsLogAdded")]
+    partial class OptionsLogAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

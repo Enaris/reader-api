@@ -47,6 +47,26 @@ namespace Reader.API.DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "OptionsLogs",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(nullable: false),
+                    InitialWPM = table.Column<int>(nullable: false),
+                    InitialCPM = table.Column<int>(nullable: false),
+                    TargetWPM = table.Column<int>(nullable: false),
+                    TargetCPM = table.Column<int>(nullable: false),
+                    BreakIfLonger = table.Column<int>(nullable: false),
+                    AppendIfShorter = table.Column<int>(nullable: false),
+                    MaxAppend = table.Column<int>(nullable: false),
+                    InitialAccelaretionTimeSecs = table.Column<int>(nullable: false),
+                    AddPerMin = table.Column<double>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OptionsLogs", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -183,9 +203,10 @@ namespace Reader.API.DataAccess.Migrations
                     TargetCPM = table.Column<int>(nullable: false),
                     BreakIfLonger = table.Column<int>(nullable: false),
                     AppendIfShorter = table.Column<int>(nullable: false),
-                    InitialAccelaretionTime = table.Column<DateTime>(nullable: false),
+                    MaxAppend = table.Column<int>(nullable: false),
+                    InitialAccelaretionTimeSecs = table.Column<int>(nullable: false),
                     AddPerMin = table.Column<double>(nullable: false),
-                    ReaderUserId = table.Column<Guid>(nullable: true)
+                    ReaderUserId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -195,7 +216,7 @@ namespace Reader.API.DataAccess.Migrations
                         column: x => x.ReaderUserId,
                         principalTable: "ReaderUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -249,15 +270,15 @@ namespace Reader.API.DataAccess.Migrations
                     StartTime = table.Column<DateTime>(nullable: false),
                     EndTime = table.Column<DateTime>(nullable: false),
                     ReadingId = table.Column<Guid>(nullable: false),
-                    OptionsId = table.Column<Guid>(nullable: false)
+                    OptionsLogId = table.Column<Guid>(nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ReadingSessions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ReadingSessions_Options_OptionsId",
-                        column: x => x.OptionsId,
-                        principalTable: "Options",
+                        name: "FK_ReadingSessions_OptionsLogs_OptionsLogId",
+                        column: x => x.OptionsLogId,
+                        principalTable: "OptionsLogs",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -348,9 +369,10 @@ namespace Reader.API.DataAccess.Migrations
                 column: "ReaderUserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ReadingSessions_OptionsId",
+                name: "IX_ReadingSessions_OptionsLogId",
                 table: "ReadingSessions",
-                column: "OptionsId");
+                column: "OptionsLogId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_ReadingSessions_ReadingId",
@@ -391,6 +413,9 @@ namespace Reader.API.DataAccess.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Options");
+
+            migrationBuilder.DropTable(
                 name: "ReadingSessions");
 
             migrationBuilder.DropTable(
@@ -400,7 +425,7 @@ namespace Reader.API.DataAccess.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Options");
+                name: "OptionsLogs");
 
             migrationBuilder.DropTable(
                 name: "Readings");

@@ -16,6 +16,7 @@ namespace Reader.API.DataAccess.Context
         public DbSet<ReaderUser> ReaderUsers { get; set; }
         public DbSet<Reading> Readings { get; set; }
         public DbSet<Options> Options { get; set; }
+        public DbSet<OptionsLog> OptionsLogs { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<ReadingTag> ReadingTags { get; set; }
         public DbSet<ReadingSession> ReadingSessions { get; set; }

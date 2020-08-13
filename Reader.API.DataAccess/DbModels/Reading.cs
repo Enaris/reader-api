@@ -13,9 +13,11 @@ namespace Reader.API.DataAccess.DbModels
         public string CoverUrl { get; set; }
         public string Description { get; set; }
         public string Links { get; set; }
+        public int SavedLocation { get; set; }
 
         public Guid ReaderUserId { get; set; }
         public ReaderUser ReaderUser { get; set; }
+        public virtual ICollection<ReadingSession> ReadingSessions { get; set; }
         public virtual ICollection<ReadingTag> ReadingTags { get; set; }
     }
 }

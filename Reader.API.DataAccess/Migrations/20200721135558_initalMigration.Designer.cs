@@ -10,7 +10,7 @@ using Reader.API.DataAccess.Context;
 namespace Reader.API.DataAccess.Migrations
 {
     [DbContext(typeof(ReaderContext))]
-    [Migration("20200719170817_initalMigration")]
+    [Migration("20200721135558_initalMigration")]
     partial class initalMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -237,8 +237,8 @@ namespace Reader.API.DataAccess.Migrations
                     b.Property<int>("BreakIfLonger")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("InitialAccelaretionTime")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("InitialAccelaretionTimeSecs")
+                        .HasColumnType("int");
 
                     b.Property<int>("InitialCPM")
                         .HasColumnType("int");
@@ -246,10 +246,13 @@ namespace Reader.API.DataAccess.Migrations
                     b.Property<int>("InitialWPM")
                         .HasColumnType("int");
 
+                    b.Property<int>("MaxAppend")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("ReaderUserId")
+                    b.Property<Guid>("ReaderUserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("TargetCPM")
@@ -263,6 +266,44 @@ namespace Reader.API.DataAccess.Migrations
                     b.HasIndex("ReaderUserId");
 
                     b.ToTable("Options");
+                });
+
+            modelBuilder.Entity("Reader.API.DataAccess.DbModels.OptionsLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<double>("AddPerMin")
+                        .HasColumnType("float");
+
+                    b.Property<int>("AppendIfShorter")
+                        .HasColumnType("int");
+
+                    b.Property<int>("BreakIfLonger")
+                        .HasColumnType("int");
+
+                    b.Property<int>("InitialAccelaretionTimeSecs")
+                        .HasColumnType("int");
+
+                    b.Property<int>("InitialCPM")
+                        .HasColumnType("int");
+
+                    b.Property<int>("InitialWPM")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaxAppend")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TargetCPM")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TargetWPM")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OptionsLogs");
                 });
 
             modelBuilder.Entity("Reader.API.DataAccess.DbModels.ReaderUser", b =>
@@ -325,7 +366,7 @@ namespace Reader.API.DataAccess.Migrations
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<Guid>("OptionsId")
+                    b.Property<Guid>("OptionsLogId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("ReadingId")
@@ -339,7 +380,8 @@ namespace Reader.API.DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OptionsId");
+                    b.HasIndex("OptionsLogId")
+                        .IsUnique();
 
                     b.HasIndex("ReadingId");
 
@@ -439,9 +481,11 @@ namespace Reader.API.DataAccess.Migrations
 
             modelBuilder.Entity("Reader.API.DataAccess.DbModels.Options", b =>
                 {
-                    b.HasOne("Reader.API.DataAccess.DbModels.ReaderUser", null)
+                    b.HasOne("Reader.API.DataAccess.DbModels.ReaderUser", "ReaderUser")
                         .WithMany("Options")
-                        .HasForeignKey("ReaderUserId");
+                        .HasForeignKey("ReaderUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Reader.API.DataAccess.DbModels.ReaderUser", b =>
@@ -462,14 +506,14 @@ namespace Reader.API.DataAccess.Migrations
 
             modelBuilder.Entity("Reader.API.DataAccess.DbModels.ReadingSession", b =>
                 {
-                    b.HasOne("Reader.API.DataAccess.DbModels.Options", "Options")
-                        .WithMany()
-                        .HasForeignKey("OptionsId")
+                    b.HasOne("Reader.API.DataAccess.DbModels.OptionsLog", "OptionsLog")
+                        .WithOne("ReadingSession")
+                        .HasForeignKey("Reader.API.DataAccess.DbModels.ReadingSession", "OptionsLogId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Reader.API.DataAccess.DbModels.Reading", "Reading")
-                        .WithMany()
+                        .WithMany("ReadingSessions")
                         .HasForeignKey("ReadingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

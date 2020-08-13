@@ -15,7 +15,7 @@ namespace Reader.API.DataAccess.DbModels
 
         public Guid ReadingId { get; set; }
         public Reading Reading { get; set; }
-        public Guid OptionsId { get; set; }
-        public Options Options { get; set; }
+        public Guid OptionsLogId { get; set; }
+        public OptionsLog OptionsLog { get; set; }
     }
 }
