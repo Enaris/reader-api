@@ -1,4 +1,5 @@
 ﻿using Reader.API.DataAccess.DbModels;
+using Reader.API.Services.DTOs.Response;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -9,6 +10,6 @@ namespace Reader.API.Services.Services
     public interface ITokenService
     {
         string GenerateJwtToken(AspUser user);
-        Task<string> RefreshToken(string token);
+        Task<LoginResponse> RefreshToken(string token);
     }
 }

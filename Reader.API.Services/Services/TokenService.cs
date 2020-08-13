@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Reader.API.DataAccess.DbModels;
+using Reader.API.Services.DTOs.Response;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -51,12 +52,8 @@ namespace Reader.API.Services.Services
             return tokenHanlder.WriteToken(token);
         }
 
-        /// <summary>
-        /// Refreshes jwt token
-        /// </summary>
-        /// <param name="token">Old token</param>
-        /// <returns>New token</returns>
-        public async Task<string> RefreshToken(string token)
+        
+        public async Task<LoginResponse> RefreshToken(string token)
         {
             var tokenValidationParams = new TokenValidationParameters
             {
@@ -93,7 +90,12 @@ namespace Reader.API.Services.Services
             if (userDb == null)
                 return null;
 
-            return GenerateJwtToken(userDb);
+            return new LoginResponse
+            {
+                AspUserId = userDb.Id,
+                Email = userDb.Email,
+                Token = GenerateJwtToken(userDb)
+            };
         }
     }
 }
