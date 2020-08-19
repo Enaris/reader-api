@@ -340,4 +340,4 @@ ASALocalRun/
 healthchecksdb
 
 # images 
-Images/
+**/Images/Covers
