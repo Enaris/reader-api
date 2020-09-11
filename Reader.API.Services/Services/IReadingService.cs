@@ -13,5 +13,6 @@ namespace Reader.API.Services.Services
         Task<Reading> CreateReading(ReadingAddRequest request, Guid readerUserId, string coverUrl = null);
         Task<IEnumerable<ReadingListItem>> GetUserReadings(Guid readerUserId);
         Task<ReadingDetails> GetReading(Guid readerUserId, Guid readingId);
+        Task<bool> UpdateSavedLocation(Guid readerUserId, Guid readingId, int newLocation);
     }
 }

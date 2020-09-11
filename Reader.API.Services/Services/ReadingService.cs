@@ -74,5 +74,19 @@ namespace Reader.API.Services.Services
 
             return mapper.Map<ReadingDetails>(readingDb);
         }
+    
+        public async Task<bool> UpdateSavedLocation(Guid readerUserId, Guid readingId, int newLocation)
+        {
+            var readingDb = await readingRepo
+                .GetWithTags()
+                .FirstOrDefaultAsync(r => r.Id == readingId && r.ReaderUserId == readerUserId);
+
+            if (readingDb == null)
+                return false;
+
+            readingDb.SavedLocation = newLocation;
+            await readingRepo.SaveChangesAsync();
+            return true;
+        }
     }
 }
