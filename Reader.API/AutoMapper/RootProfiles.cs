@@ -9,7 +9,10 @@ namespace Reader.API.AutoMapper
     {
         public static Type[] Maps => new[]
         {
-            typeof(TagProfiles)
+            typeof(TagProfiles),
+            typeof(ReadingProfiles),
+            typeof(OptionsLogProfiles), 
+            typeof(ReadingSessionProfiles)
         };
     }
 }
