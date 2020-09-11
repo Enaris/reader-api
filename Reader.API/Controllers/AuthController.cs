@@ -23,17 +23,18 @@ namespace Reader.API.Controllers
         private readonly UserManager<AspUser> userManager;
         private readonly SignInManager<AspUser> signInManager;
         private readonly ITokenService tokenService;
-        private readonly IConfiguration configuration;
+        private readonly IReaderUserService readerUserService;
 
         public AuthController(UserManager<AspUser> userManager, 
             SignInManager<AspUser> signInManager, 
             ITokenService tokenService, 
-            IConfiguration configuration)
+            IReaderUserService readerUserService
+            )
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
             this.tokenService = tokenService;
-            this.configuration = configuration;
+            this.readerUserService = readerUserService;
         }
 
         [HttpPost("register")]
@@ -41,9 +42,12 @@ namespace Reader.API.Controllers
         {
             var user = new AspUser { Email = request.Email, UserName = request.Email };
             var created = await userManager.CreateAsync(user, request.Password);
-
+            
             if (!created.Succeeded)
                 return BadRequest(created.Errors);
+
+            var newUser = await userManager.FindByEmailAsync(request.Email);
+            await readerUserService.Create(new Guid(newUser.Id));
 
             return Ok();
         }
