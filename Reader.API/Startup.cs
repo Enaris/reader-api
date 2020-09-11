@@ -1,20 +1,26 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Reader.API.AutoMapper;
 using Reader.API.DataAccess.Context;
 using Reader.API.DataAccess.DbModels;
+using Reader.API.DataAccess.Repositories;
 using Reader.API.Services.Services;
 
 namespace Reader.API
@@ -65,7 +71,21 @@ namespace Reader.API
                 });
             services.AddAuthorization();
 
+            services.AddAutoMapper(RootProfiles.Maps);
+
+            // services
             services.AddScoped<ITokenService, TokenService>();
+            services.AddScoped<IUploadService, UploadService>();
+            services.AddScoped<ITagService, TagService>();
+            services.AddScoped<IReadingTagService, ReadingTagService>();
+            services.AddScoped<IReadingService, ReadingService>();
+            services.AddScoped<IReaderUserService, ReaderUserService>();
+
+            // repos 
+            services.AddScoped<ITagRepository, TagRepository>();
+            services.AddScoped<IReadingRepository, ReadingRepository>();
+            services.AddScoped<IReadingTagRepository, ReadingTagRepository>();
+            services.AddScoped<IReaderUserRepository, ReaderUserRepository>();
 
         }
 
@@ -82,6 +102,13 @@ namespace Reader.API
                     .WithOrigins("http://localhost:3000")
                     .AllowAnyHeader()
                     .AllowAnyMethod());
+
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                FileProvider = new PhysicalFileProvider(
+                    Path.Combine(Directory.GetCurrentDirectory(), @"Static")),
+                RequestPath = new PathString("/Static")
+            });
 
             app.UseRouting();
 
