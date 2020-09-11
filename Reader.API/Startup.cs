@@ -86,6 +86,8 @@ namespace Reader.API
             services.AddScoped<IReadingRepository, ReadingRepository>();
             services.AddScoped<IReadingTagRepository, ReadingTagRepository>();
             services.AddScoped<IReaderUserRepository, ReaderUserRepository>();
+            services.AddScoped<IReadingSessionRepository, ReadingSessionRepository>();
+            services.AddScoped<IOptionsLogRepository, OptionsLogRepository>();
 
         }
 
