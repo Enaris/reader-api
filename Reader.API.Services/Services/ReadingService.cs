@@ -66,13 +66,20 @@ namespace Reader.API.Services.Services
             return mapper.Map<IEnumerable<ReadingListItem>>(result);
         }
 
-        public async Task<ReadingDetails> GetReading(Guid readerUserId, Guid readingId)
+        public async Task<ReadingDetails> GetReadingDetails(Guid readerUserId, Guid readingId)
         {
             var readingDb = await readingRepo
                 .GetWithTags()
                 .FirstOrDefaultAsync(r => r.Id == readingId && r.ReaderUserId == readerUserId);
 
             return mapper.Map<ReadingDetails>(readingDb);
+        }
+        
+        public async Task<Reading> GetReading(Guid readerUserId, Guid readingId)
+        {
+            return await readingRepo
+                .GetAll()
+                .FirstOrDefaultAsync(r => r.Id == readingId && r.ReaderUserId == readerUserId);
         }
     
         public async Task<bool> UpdateSavedLocation(Guid readerUserId, Guid readingId, int newLocation)
@@ -87,6 +94,28 @@ namespace Reader.API.Services.Services
             readingDb.SavedLocation = newLocation;
             await readingRepo.SaveChangesAsync();
             return true;
+        }
+
+        public async Task<bool> UpdateReading(string newCover, Reading readingDb, ReadingUpdateRequest request)
+        {
+            mapper.Map(request, readingDb);
+            if (request.RemoveCover)
+                readingDb.CoverUrl = null;
+            if (newCover != null)
+                readingDb.CoverUrl = newCover;
+            if (request.ChangeText)
+                readingDb.SavedLocation = 0;
+
+            readingRepo.Update(readingDb);
+            await readingRepo.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> ReadingExist(Guid readerUserId, Guid readingId)
+        {
+            return await readingRepo
+                .GetAll()
+                .AnyAsync(r => r.Id == readingId && r.ReaderUserId == readerUserId);
         }
     }
 }

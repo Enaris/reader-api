@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Reader.API.DataAccess.DbModels;
 using Reader.API.Services.DTOs.Request;
+using Reader.API.Services.DTOs.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace Reader.API.AutoMapper
         public OptionsLogProfiles()
         {
             CreateMap<OptionsLogAddRequest, OptionsLog>();
+            CreateMap<OptionsLog, OptionsLogDetails>();
         }
     }
 }

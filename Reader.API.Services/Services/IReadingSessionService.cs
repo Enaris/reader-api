@@ -8,5 +8,6 @@ namespace Reader.API.Services.Services
     {
         Task CreateReadingSession(ReadingSessionAddRequest request);
         Task CreateReadingSession(SaveSessionRequest request, Guid optionsLogId);
+        Task DeleteAllSessionsForReading(Guid readingId);
     }
 }

@@ -18,7 +18,8 @@ namespace Reader.API.AutoMapper
                 .ForMember(rli => rli.Tags, o => o.MapFrom(r => r.ReadingTags));
             CreateMap<Reading, ReadingDetails>()
                 .ForMember(rd => rd.Tags, o => o.MapFrom(r => r.ReadingTags));
-
+            CreateMap<ReadingUpdateRequest, Reading>()
+                .ForMember(r => r.Text, o => o.PreCondition(rur => rur.ChangeText));
         }
     }
 }

@@ -20,7 +20,7 @@ namespace Reader.API.Services.Services
             }
 
             CreateUserFolderIfDoesNotExist(aspUserId);
-            var filePath = GetFilePath(request.FileName, aspUserId);
+            var filePath = GetFilePath(Path.GetExtension(request.FileName), aspUserId);
 
             using (var stream = System.IO.File.Create(filePath))
             {
@@ -45,10 +45,10 @@ namespace Reader.API.Services.Services
             return result;
         }
 
-        private string GetFilePath(string filename, Guid aspUserId)
+        private string GetFilePath(string extension, Guid aspUserId)
         {
             var folderPath = FOLDER_PATH;
-            return $"{folderPath}/{aspUserId}/{filename}";
+            return $"{folderPath}/{aspUserId}/{Guid.NewGuid()}{extension}";
         }
 
         private void CreateUserFolderIfDoesNotExist(Guid aspUserId)

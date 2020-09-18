@@ -12,7 +12,10 @@ namespace Reader.API.Services.Services
         Task<IEnumerable<ReadingListItem>> GetReadings(ReadingsRequest request, Guid readerUserId);
         Task<Reading> CreateReading(ReadingAddRequest request, Guid readerUserId, string coverUrl = null);
         Task<IEnumerable<ReadingListItem>> GetUserReadings(Guid readerUserId);
-        Task<ReadingDetails> GetReading(Guid readerUserId, Guid readingId);
+        Task<ReadingDetails> GetReadingDetails(Guid readerUserId, Guid readingId);
         Task<bool> UpdateSavedLocation(Guid readerUserId, Guid readingId, int newLocation);
+        Task<bool> UpdateReading(string newCover, Reading readingDb, ReadingUpdateRequest request);
+        Task<bool> ReadingExist(Guid readerUserId, Guid readingId);
+        Task<Reading> GetReading(Guid readerUserId, Guid readingId);
     }
 }

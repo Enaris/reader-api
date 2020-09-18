@@ -12,8 +12,7 @@ namespace Reader.API.AutoMapper
     {
         public ReadingSessionProfiles()
         {
-            CreateMap<SaveSessionRequest, ReadingSessionAddRequest>();
-            CreateMap<ReadingSessionAddRequest, ReadingSession>();
+            CreateMap<SaveSessionRequest, ReadingSession>();
         }
     }
 }

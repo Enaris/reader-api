@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Reader.API.DataAccess.DbModels;
 using Reader.API.DataAccess.Repositories;
 using Reader.API.Services.DTOs.Request;
@@ -32,6 +33,18 @@ namespace Reader.API.Services.Services
             var readingSessionToAdd = mapper.Map<ReadingSession>(request);
             readingSessionToAdd.OptionsLogId = optionsLogId;
             await readingSessionRepo.CreateAsync(readingSessionToAdd);
+            await readingSessionRepo.SaveChangesAsync();
+        }
+
+        public async Task DeleteAllSessionsForReading(Guid readingId)
+        {
+            var sessionsToRemove = await readingSessionRepo
+                .GetAll(rs => rs.ReadingId == readingId)
+                .ToListAsync();
+
+            foreach (var rs in sessionsToRemove)
+                readingSessionRepo.Delete(rs);
+
             await readingSessionRepo.SaveChangesAsync();
         }
     }

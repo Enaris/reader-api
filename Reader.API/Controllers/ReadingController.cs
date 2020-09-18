@@ -21,12 +21,14 @@ namespace Reader.API.Controllers
         private readonly IReadingTagService readingTagService;
         private readonly IReaderUserService readerUserService;
         private readonly IReadingService readingService;
+        private readonly IFileDeleteService fileDeleteService;
 
         public ReadingController(IUploadService uploadService, 
             ITagService tagService, 
             IReadingTagService readingTagService, 
             IReaderUserService readerUserService, 
-            IReadingService readingService
+            IReadingService readingService, 
+            IFileDeleteService fileDeleteService
             )
         {
             this.uploadService = uploadService;
@@ -34,6 +36,7 @@ namespace Reader.API.Controllers
             this.readingTagService = readingTagService;
             this.readerUserService = readerUserService;
             this.readingService = readingService;
+            this.fileDeleteService = fileDeleteService;
         }
 
         [HttpPost("addReading")]
@@ -64,19 +67,7 @@ namespace Reader.API.Controllers
 
             return Ok();
         }
-
-        //[HttpGet("user/{aspUserId}")]
-        //public async Task<IActionResult> GetUserReadings([FromRoute] Guid aspUserId)
-        //{
-        //    var userDb = await readerUserService.GetByAspId(aspUserId);
-
-        //    if (userDb == null)
-        //        return BadRequest(new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>("User", "Requesting user does not exist") });
-
-        //    var readings = await readingService.GetUserReadings(userDb.Id);
-
-        //    return Ok(readings);
-        //}
+        
         
         [HttpGet("user/{aspUserId}")]
         public async Task<IActionResult> GetReadings([FromRoute] Guid aspUserId, 
@@ -102,12 +93,48 @@ namespace Reader.API.Controllers
             if (userDb == null)
                 return BadRequest(new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>("User", "Requesting user does not exist") });
 
-            var reading = await readingService.GetReading(userDb.Id, readingId);
+            var reading = await readingService.GetReadingDetails(userDb.Id, readingId);
 
             if (reading == null)
                 return NotFound();
 
             return Ok(reading);
+        }
+
+        [HttpPost("updateReading")]
+        public async Task<IActionResult> UpdateReading([FromForm] ReadingUpdateRequest request)
+        {
+            var userDb = await readerUserService.GetByAspId(request.AspUserId);
+            if (userDb == null)
+                return BadRequest(new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>("User", "Requesting user does not exist") });
+
+            var readingDb = await readingService.GetReading(userDb.Id, request.ReadingId);
+
+            if (request.RemoveCover)
+                fileDeleteService.DeleteFile(readingDb.CoverUrl);
+
+            if (request.TagsToRemove != null && request.TagsToRemove.Any())
+                await readingTagService.DeleteReadingTags(request.TagsToRemove, request.ReadingId);
+
+            var newReadingTags = new List<ReadingTag>();
+            if (request.TagsToAdd != null && request.TagsToAdd.Any())
+                newReadingTags = (await tagService.CreateTags(request.TagsToAdd, userDb.Id))
+                    .Select(tDto => new ReadingTag { ReadingId = request.ReadingId, TagId = tDto.Id })
+                    .ToList();
+
+            if (request.TagsToAssign != null && request.TagsToAssign.Any())
+                newReadingTags
+                    .AddRange(request.TagsToAssign.Select(t => new ReadingTag { ReadingId = request.ReadingId, TagId = t }));
+
+            if (newReadingTags.Any())
+                await readingTagService.CreateReadingTags(newReadingTags);
+
+            string newCover = null;
+            if (request.NewCoverImage != null)
+                newCover = await uploadService.UploadImage(request.NewCoverImage, userDb.UserAspId);
+            await readingService.UpdateReading(newCover, readingDb, request);
+
+            return Ok();
         }
     }
 }
