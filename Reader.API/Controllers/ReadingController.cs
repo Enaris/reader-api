@@ -136,5 +136,24 @@ namespace Reader.API.Controllers
 
             return Ok();
         }
+    
+        [HttpPost("user/{aspUserId}/delete/{readingId}")]
+        public async Task<IActionResult> DeleteReading([FromRoute] Guid aspUserId, [FromRoute] Guid readingId)
+        {
+            var userDb = await readerUserService.GetByAspId(aspUserId);
+
+            if (userDb == null)
+                return BadRequest(new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>("User", "Requesting user does not exist") });
+
+            var readingDb = await readingService.GetReading(userDb.Id, readingId);
+            if (readingDb == null)
+                return Ok();
+
+            if (readingDb.CoverUrl != null)
+                fileDeleteService.DeleteFile(readingDb.CoverUrl);
+
+            await readingService.RemoveReading(readingDb);
+            return Ok();
+        }
     }
 }

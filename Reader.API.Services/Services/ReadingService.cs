@@ -111,6 +111,12 @@ namespace Reader.API.Services.Services
             return true;
         }
 
+        public async Task RemoveReading(Reading readingDb)
+        {
+            readingRepo.Delete(readingDb);
+            await readingRepo.SaveChangesAsync();
+        }
+
         public async Task<bool> ReadingExist(Guid readerUserId, Guid readingId)
         {
             return await readingRepo

@@ -17,5 +17,6 @@ namespace Reader.API.Services.Services
         Task<bool> UpdateReading(string newCover, Reading readingDb, ReadingUpdateRequest request);
         Task<bool> ReadingExist(Guid readerUserId, Guid readingId);
         Task<Reading> GetReading(Guid readerUserId, Guid readingId);
+        Task RemoveReading(Reading readingDb);
     }
 }
