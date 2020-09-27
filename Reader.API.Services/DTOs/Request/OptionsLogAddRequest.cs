@@ -14,7 +14,7 @@ namespace Reader.API.Services.DTOs.Request
         public int SlowIfLonger { get; set; }
         public int AppendIfShorter { get; set; }
         public int MaxAppend { get; set; }
-        public int InitialAccelaretionTimeSecs { get; set; }
+        public int InitialAccelerationTimeSecs { get; set; }
         public int SlowTo { get; set; }
         public double AddPerMin { get; set; }
     }
