@@ -45,5 +45,50 @@ namespace Reader.API.Controllers
 
             return Ok();
         }
+
+        [HttpGet("user/{aspUserId}/reading/{readingId}/session/{sessionId}/graph")]
+        public async Task<IActionResult> GraphDataForSession([FromRoute] Guid aspUserId, [FromRoute] Guid sessionId, [FromRoute] Guid readingId)
+        {
+            var userDb = await readerUserService.GetByAspId(aspUserId);
+            if (userDb == null)
+                return BadRequest(new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>("User", "Requesting user does not exist") });
+
+            var reading = await readingService.GetReading(userDb.Id, readingId);
+            if (reading == null)
+                return BadRequest(new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>("Reading", "Reading does not exist") });
+
+            var graphData = await readingSessionService.GetSessionGraphData(sessionId, reading);
+            if (graphData == null)
+                return BadRequest(new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>("Session", "Session does not exist") });
+
+            return Ok(graphData);
+        }
+
+        [HttpGet("user/{aspUserId}/reading/{readingId}/graph")]
+        public async Task<IActionResult> GraphDataForReading([FromRoute] Guid aspUserId, [FromRoute] Guid readingId)
+        {
+            var userDb = await readerUserService.GetByAspId(aspUserId);
+            if (userDb == null)
+                return BadRequest(new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>("User", "Requesting user does not exist") });
+
+            var graphData = await readingSessionService.GetReadingGraphData(readingId);
+
+            if (graphData == null)
+                return BadRequest(new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>("Reading", "Reading does not exist") });
+
+            return Ok(graphData);
+        }
+
+        [HttpGet("user/{aspUserId}/reading/{readingId}/dropdown")]
+        public async Task<IActionResult> GetForDropDown([FromRoute] Guid aspUserId, [FromRoute] Guid readingId)
+        {
+            var userDb = await readerUserService.GetByAspId(aspUserId);
+            if (userDb == null)
+                return BadRequest(new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>("User", "Requesting user does not exist") });
+
+            var sessions = await readingSessionService.GetForDropDown(readingId);
+
+            return Ok(sessions);
+        }
     }
 }
