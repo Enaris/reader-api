@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Reader.API.Services.DTOs.Response.Tag;
 using Reader.API.Services.Services;
 
 namespace Reader.API.Controllers
@@ -32,6 +33,46 @@ namespace Reader.API.Controllers
             var tags = await tagService.Get(userDb.Id);
 
             return Ok(tags);
+        }
+
+        [HttpGet("{aspUserId}/table")]
+        public async Task<IActionResult> GetUserTableTags(Guid aspUserId)
+        {
+            var userDb = await readerUserService.GetByAspId(aspUserId);
+
+            if (userDb == null)
+                return BadRequest(new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>("User", "User does not seem to exist") });
+
+            var tags = await tagService.GetForTable(userDb.Id);
+
+            return Ok(tags);
+        }
+    
+        [HttpPost("{aspUserId}/delete/{tagId}")]
+        public async Task<IActionResult> Delete(Guid aspUserId, Guid tagId)
+        {
+            var userDb = await readerUserService.GetByAspId(aspUserId);
+
+            if (userDb == null)
+                return BadRequest(new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>("User", "User does not seem to exist") });
+
+            await tagService.RemoveTag(tagId);
+
+            return Ok();
+        }
+        
+        [HttpGet("{aspUserId}/tag/{tagId}")]
+        public async Task<IActionResult> Details(Guid aspUserId, Guid tagId)
+        {
+            var userDb = await readerUserService.GetByAspId(aspUserId);
+
+            if (userDb == null)
+                return BadRequest(new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>("User", "User does not seem to exist") });
+
+            var tagDetails = await tagService.GetTagDetails(tagId);
+            if (tagDetails == null)
+                return null;
+            return Ok(tagDetails);
         }
     }
 }

@@ -48,6 +48,22 @@ namespace Reader.API.Services.Helpers
             return result;
         }
 
+        public static ReadingSpeedGraphData GetReadingSpeedGraphData(IEnumerable<ReadingSession> readingSessions, IEnumerable<ReadingWord> textArray)
+        {
+            var result = new ReadingSpeedGraphData
+            {
+                AllCharactersCount = textArray.Last().EndLocation
+            };
+            var sets = new List<ReadingSpeedGraphSet>(readingSessions.Count());
+
+            foreach (var rs in readingSessions)
+            {
+                sets.Add(GetReadingSpeedGraphSet(rs, textArray.ToList()));
+            }
+            result.Sets = sets;
+            return result;
+        }
+
         public static ReadingSpeedGraphSet GetReadingSpeedGraphSet(ReadingSession readingSession, List<ReadingWord> textArray)
         {
             long msPassed = 0;

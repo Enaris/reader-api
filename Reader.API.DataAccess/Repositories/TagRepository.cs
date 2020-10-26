@@ -1,7 +1,10 @@
-﻿using Reader.API.DataAccess.Context;
+﻿using Microsoft.EntityFrameworkCore;
+using Reader.API.DataAccess.Context;
 using Reader.API.DataAccess.DbModels;
+using Reader.API.DataAccess.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Reader.API.DataAccess.Repositories
@@ -12,5 +15,12 @@ namespace Reader.API.DataAccess.Repositories
         {
         }
 
+        public IQueryable<Tag> GetAll(bool inclReadingTag = false)
+        {
+            var tagsDb = _context.Set<Tag>()
+                .IfAction(inclReadingTag, q => q
+                    .Include(r => r.ReadingTags));
+            return tagsDb;
+        }
     }
 }
