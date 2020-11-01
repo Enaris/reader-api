@@ -4,6 +4,7 @@ using Reader.API.DataAccess.DbModels;
 using Reader.API.DataAccess.Repositories;
 using Reader.API.Services.DTOs.Request;
 using Reader.API.Services.DTOs.Response;
+using Reader.API.Services.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -72,7 +73,9 @@ namespace Reader.API.Services.Services
                 .GetWithTags()
                 .FirstOrDefaultAsync(r => r.Id == readingId && r.ReaderUserId == readerUserId);
 
-            return mapper.Map<ReadingDetails>(readingDb);
+            var result = mapper.Map<ReadingDetails>(readingDb);
+            result.TotalWords = ReadingTextHelper.TextWordsAmt(readingDb.Text);
+            return result;
         }
         
         public async Task<Reading> GetReading(Guid readerUserId, Guid readingId)

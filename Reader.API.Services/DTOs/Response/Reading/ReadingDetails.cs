@@ -13,6 +13,7 @@ namespace Reader.API.Services.DTOs.Response
         public string Description { get; set; }
         public string Links { get; set; }
         public int SavedLocation { get; set; }
+        public int TotalWords { get; set; }
 
         public IEnumerable<TagDto> Tags { get; set; }
     }

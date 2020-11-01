@@ -31,6 +31,26 @@ namespace Reader.API.Services.Helpers
             return result;
         }
 
+        public static int TextWordsAmt(string readingText)
+        {
+            int wordStart = 0;
+            int wordEnd = 0;
+            int len = 0;
+            var text = readingText.ToList();
+            while (wordEnd < readingText.Length)
+            {
+                wordStart = text.FindIndex(wordEnd, c => !char.IsWhiteSpace(c));
+                if (wordStart == -1)
+                    break;
+
+                wordEnd = text.FindIndex(wordStart, c => char.IsWhiteSpace(c));
+                if (wordEnd == -1)
+                    wordEnd = text.Count;
+                ++len;
+            }
+            return len;
+        }
+
         public static ReadingSpeedGraphData GetReadingSpeedGraphData(IEnumerable<ReadingSession> readingSessions, string readingText)
         {
             var textArray = TextToArray(readingText).ToList();
@@ -155,6 +175,8 @@ namespace Reader.API.Services.Helpers
                 if (!shouldBreak)
                 {
                     ++currentIndex;
+                    if (currentIndex >= textArray.Count)
+                        break;
                     currentWord = textArray[currentIndex];
                     currentStart = currentWord.StartLocation;
                     currentEnd = currentWord.EndLocation;
