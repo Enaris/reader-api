@@ -23,13 +23,15 @@ namespace Reader.API.Controllers
         private readonly IReaderUserService readerUserService;
         private readonly IReadingService readingService;
         private readonly IFileDeleteService fileDeleteService;
+        private readonly IReadingSessionService readingSessionService;
 
         public ReadingController(IUploadService uploadService, 
             ITagService tagService, 
             IReadingTagService readingTagService, 
             IReaderUserService readerUserService, 
             IReadingService readingService, 
-            IFileDeleteService fileDeleteService
+            IFileDeleteService fileDeleteService, 
+            IReadingSessionService readingSessionService
             )
         {
             this.uploadService = uploadService;
@@ -38,6 +40,7 @@ namespace Reader.API.Controllers
             this.readerUserService = readerUserService;
             this.readingService = readingService;
             this.fileDeleteService = fileDeleteService;
+            this.readingSessionService = readingSessionService;
         }
 
         [HttpPost("addReading")]
@@ -133,6 +136,10 @@ namespace Reader.API.Controllers
             string newCover = null;
             if (request.NewCoverImage != null)
                 newCover = await uploadService.UploadImage(request.NewCoverImage, userDb.UserAspId);
+
+            if (request.ChangeText)
+                await readingSessionService.DeleteAllSessionsForReading(readingDb.Id);
+
             await readingService.UpdateReading(newCover, readingDb, request);
 
             return Ok();
