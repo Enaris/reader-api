@@ -12,6 +12,7 @@ using Microsoft.IdentityModel.Tokens;
 using Reader.API.DataAccess.DbModels;
 using Reader.API.Services.DTOs.Request;
 using Reader.API.Services.DTOs.Response;
+using Reader.API.Services.Helpers;
 using Reader.API.Services.Services;
 
 namespace Reader.API.Controllers
@@ -44,7 +45,11 @@ namespace Reader.API.Controllers
             var created = await userManager.CreateAsync(user, request.Password);
             
             if (!created.Succeeded)
-                return BadRequest(created.Errors);
+            {
+                var duplicateEmail = created.Errors.Any(e => e.Code == "DuplicateEmail");
+                return BadRequest(duplicateEmail ? ErrorsHelper.DuplicateEmail() : ErrorsHelper.SthWrongHappend());
+            }
+
 
             var newUser = await userManager.FindByEmailAsync(request.Email);
             await readerUserService.Create(new Guid(newUser.Id));
@@ -58,12 +63,12 @@ namespace Reader.API.Controllers
             var userDb = await userManager.FindByEmailAsync(request.Email);
 
             if (userDb == null)
-                return BadRequest(new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>("Login", "Email or password is invalid") });
+                return BadRequest(ErrorsHelper.BadLoginOrPassword());
 
             var loginResult = await signInManager.CheckPasswordSignInAsync(userDb, request.Password, false);
 
             if (!loginResult.Succeeded)
-                return BadRequest(new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>("Login", "Email or password is invalid") });
+                return BadRequest(ErrorsHelper.BadLoginOrPassword());
 
             var token = tokenService.GenerateJwtToken(userDb);
 

@@ -34,11 +34,25 @@ namespace Reader.API.Services.Services
         public async Task<IEnumerable<TagDto>> CreateTags(IEnumerable<string> tagsNames, Guid readerUserId)
         {
             var tagsToAdd = tagsNames.Select(t => new Tag { Name = t, ReaderUserId = readerUserId }).ToList();
+            var result = new List<Tag>();
 
-            tagRepo.AddRange(tagsToAdd);
+            //tagRepo.AddRange(tagsToAdd);
+            foreach (var tag in tagsToAdd)
+            {
+                var tagDb = await tagRepo
+                    .GetAll()
+                    .FirstOrDefaultAsync(t => t.Name == tag.Name && t.ReaderUserId == tag.ReaderUserId);
+
+                if (tagDb != null)
+                    continue;
+
+                result.Add(tag);
+                await tagRepo.CreateAsync(tag);
+            }
+            
             await tagRepo.SaveChangesAsync();
 
-            return mapper.Map<IEnumerable<TagDto>>(tagsToAdd);
+            return mapper.Map<IEnumerable<TagDto>>(result);
         }
 
         public async Task<IEnumerable<TagDto>> Get(Guid readerUserId)

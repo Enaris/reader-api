@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -21,5 +22,23 @@ namespace Reader.API.Services.DTOs.Request
         public IEnumerable<string> TagsToAdd { get; set; }
         public IEnumerable<Guid> TagsToAssign { get; set; }
         public IEnumerable<Guid> TagsToRemove { get; set; }
+    }
+
+    public class ReadingUpdateRequestValidator : AbstractValidator<ReadingUpdateRequest>
+    {
+        public ReadingUpdateRequestValidator()
+        {
+            RuleFor(r => r.Title)
+                .NotEmpty().WithMessage("Title is required");
+            When(r => r.ChangeText, () =>
+            {
+                RuleFor(r => r.Text)
+                    .NotEmpty().WithMessage("Text is required");
+            });
+            RuleFor(r => r.Description)
+                .MaximumLength(254).WithMessage("Description is too long");
+            RuleFor(r => r.Links)
+                .MaximumLength(254).WithMessage("Links are too long");
+        }
     }
 }

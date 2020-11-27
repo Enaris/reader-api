@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -21,6 +23,7 @@ using Reader.API.AutoMapper;
 using Reader.API.DataAccess.Context;
 using Reader.API.DataAccess.DbModels;
 using Reader.API.DataAccess.Repositories;
+using Reader.API.Services.DTOs.Request;
 using Reader.API.Services.Services;
 
 namespace Reader.API
@@ -37,7 +40,8 @@ namespace Reader.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers()
+                .AddFluentValidation();
             var migrationAssembly = $"{ nameof(Reader) }.{ nameof(Reader.API) }.{ nameof(Reader.API.DataAccess) }";
             services
                 .AddDbContext<ReaderContext>(o =>
@@ -91,6 +95,11 @@ namespace Reader.API
             services.AddScoped<IReaderUserRepository, ReaderUserRepository>();
             services.AddScoped<IReadingSessionRepository, ReadingSessionRepository>();
             services.AddScoped<IOptionsLogRepository, OptionsLogRepository>();
+
+            // validation
+            services.AddTransient<IValidator<RegisterRequest>, RegisterRequestValidator>();
+            services.AddTransient<IValidator<ReadingAddRequest>, ReadingAddRequestValidator>();
+            services.AddTransient<IValidator<ReadingUpdateRequest>, ReadingUpdateRequestValidator>();
 
         }
 
