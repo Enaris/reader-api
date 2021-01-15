@@ -47,7 +47,7 @@ namespace Reader.API.DataAccess.Repositories
             _context.Set<T>().Remove(item);
         }
 
-        public async Task SaveChangesAsync()
+        public virtual async Task SaveChangesAsync()
         {
             await _context.SaveChangesAsync();
         }
