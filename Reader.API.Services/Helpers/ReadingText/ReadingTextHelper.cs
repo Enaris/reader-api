@@ -13,6 +13,10 @@ namespace Reader.API.Services.Helpers
         public static IEnumerable<ReadingWord> TextToArray(string readingText)
         {
             var result = new List<ReadingWord>();
+
+            if (string.IsNullOrEmpty(readingText))
+                return result;
+
             int wordStart = 0;
             int wordEnd = 0;
             var text = readingText.ToList();
@@ -33,6 +37,9 @@ namespace Reader.API.Services.Helpers
 
         public static int TextWordsAmt(string readingText)
         {
+            if (string.IsNullOrEmpty(readingText))
+                return 0;
+
             int wordStart = 0;
             int wordEnd = 0;
             int len = 0;
@@ -200,20 +207,20 @@ namespace Reader.API.Services.Helpers
             return result;
         }
 
-        private static bool ShouldDoConstAcc(bool doConstAcc, long msPassed, long iniAccTimeMs, bool doIniAcc)
+        public static bool ShouldDoConstAcc(bool doConstAcc, long msPassed, long iniAccTimeMs, bool doIniAcc)
         {
             return (doConstAcc && !doIniAcc) ||
                 (doConstAcc && doIniAcc && iniAccTimeMs < msPassed);
         }
-        private static bool ShouldDoIniAcc(bool doIniAcc, long iniAccTime, long msPassed, double currentSpeed, double targetSpeed)
+        public static bool ShouldDoIniAcc(bool doIniAcc, long iniAccTime, long msPassed, double currentSpeed, double targetSpeed)
         {
             return doIniAcc && ((iniAccTime > msPassed) || (currentSpeed < targetSpeed));
         }
-        private static bool ShouldSlow(bool doSlow, int slowIfLonger, int overallLength)
+        public static bool ShouldSlow(bool doSlow, int slowIfLonger, int overallLength)
         {
             return doSlow && slowIfLonger < overallLength;
         }
-        private static bool ShouldAppend(bool doAppend, int appended, int maxAppend, int appendIfShorter, int wordLength, bool doBreak, int breakIfLonger, int overallLength)
+        public static bool ShouldAppend(bool doAppend, int appended, int maxAppend, int appendIfShorter, int wordLength, bool doBreak, int breakIfLonger, int overallLength)
         {
             var append = appended < maxAppend;
             var appendShort = wordLength < appendIfShorter;
@@ -223,20 +230,25 @@ namespace Reader.API.Services.Helpers
 
             return doAppend && append && appendShort && allBreakConditions;
         }
-        private static bool ShouldBreak(bool doBreak, int breakIfLonger, int overallLength)
+        public static bool ShouldBreak(bool doBreak, int breakIfLonger, int overallLength)
         {
             return doBreak && breakIfLonger < overallLength;
         }
-        private static bool DidBreak(bool doBreak, int wordEnd, int lastEnd)
+        public static bool DidBreak(bool doBreak, int wordEnd, int lastEnd)
         {
             return doBreak && wordEnd != lastEnd;
         }
 
-        public static int WaitToWpm(int waitMs) => (int)Math.Floor(1.0 / (waitMs / 60000.0));
-        public static int WaitToCpm(int waitMs, int len) => (int)Math.Floor(1.0 / ((double)waitMs / (double)len / 60000.0));
-        public static int CpmToWaitMs(double cpm, int len) => (int)Math.Floor((60.0 / cpm * (double)len * 1000.0) + 0.5);
-        public static int WpmToWaitMs(double wpm) => (int)Math.Floor((60.0 / wpm * 1000.0) + 0.5);
-        public static double GetSpeedIncrease(double accPerMin, long msPassed) => (accPerMin / (60.0 * 1000.0)) * msPassed;
+        public static int WaitToWpm(int waitMs) => waitMs <= 0 ? 0 
+            : (int)Math.Floor(1.0 / (waitMs / 60000.0));
+        public static int WaitToCpm(int waitMs, int len) => waitMs <= 0 || len == 0 ? 0 
+            : (int)Math.Floor(1.0 / ((double)waitMs / (double)len / 60000.0));
+        public static int WpmToWaitMs(double wpm) => wpm <= 0 ? 0 
+            : (int)Math.Floor((60.0 / wpm * 1000.0) + 0.5);
+        public static int CpmToWaitMs(double cpm, int len) => cpm <= 0 || len == 0 ? 0 
+            : (int)Math.Floor((60.0 / cpm * (double)len * 1000.0) + 0.5);
+        public static double GetSpeedIncrease(double accPerMin, long msPassed) => msPassed <= 0 ? 0 
+            : (accPerMin / (60.0 * 1000.0)) * msPassed;
         public static double GetSpeedIncrease(double initialSpeed, double targetSpeed, long accTimeMs, long msPassed)
         {
             var maxIncrease = targetSpeed - initialSpeed;
