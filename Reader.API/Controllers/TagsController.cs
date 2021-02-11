@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Reader.API.Services.DTOs.Response.Tag;
@@ -23,6 +24,7 @@ namespace Reader.API.Controllers
         }
 
         [HttpGet("{aspUserId}")]
+        [Authorize]
         public async Task<IActionResult> GetUserTags(Guid aspUserId)
         {
             var userDb = await readerUserService.GetByAspId(aspUserId);
@@ -36,6 +38,7 @@ namespace Reader.API.Controllers
         }
 
         [HttpGet("{aspUserId}/table")]
+        [Authorize]
         public async Task<IActionResult> GetUserTableTags(Guid aspUserId)
         {
             var userDb = await readerUserService.GetByAspId(aspUserId);
@@ -49,6 +52,7 @@ namespace Reader.API.Controllers
         }
     
         [HttpPost("{aspUserId}/delete/{tagId}")]
+        [Authorize]
         public async Task<IActionResult> Delete(Guid aspUserId, Guid tagId)
         {
             var userDb = await readerUserService.GetByAspId(aspUserId);
@@ -62,6 +66,7 @@ namespace Reader.API.Controllers
         }
         
         [HttpGet("{aspUserId}/tag/{tagId}")]
+        [Authorize]
         public async Task<IActionResult> Details(Guid aspUserId, Guid tagId)
         {
             var userDb = await readerUserService.GetByAspId(aspUserId);

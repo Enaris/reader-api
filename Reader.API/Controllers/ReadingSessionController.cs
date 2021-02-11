@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Reader.API.Services.DTOs.Request;
@@ -30,6 +31,7 @@ namespace Reader.API.Controllers
         }
 
         [HttpPost("{aspUserId}/saveSession")]
+        [Authorize]
         public async Task<IActionResult> SaveSession([FromRoute] Guid aspUserId, [FromBody] SaveSessionRequest request)
         {
             var userDb = await readerUserService.GetByAspId(aspUserId);
@@ -47,6 +49,7 @@ namespace Reader.API.Controllers
         }
 
         [HttpGet("user/{aspUserId}/reading/{readingId}/session/{sessionId}/graph")]
+        [Authorize]
         public async Task<IActionResult> GraphDataForSession([FromRoute] Guid aspUserId, [FromRoute] Guid sessionId, [FromRoute] Guid readingId)
         {
             var userDb = await readerUserService.GetByAspId(aspUserId);
@@ -65,6 +68,7 @@ namespace Reader.API.Controllers
         }
 
         [HttpGet("user/{aspUserId}/reading/{readingId}/graph")]
+        [Authorize]
         public async Task<IActionResult> GraphDataForReading([FromRoute] Guid aspUserId, [FromRoute] Guid readingId)
         {
             var userDb = await readerUserService.GetByAspId(aspUserId);
@@ -80,6 +84,7 @@ namespace Reader.API.Controllers
         }
 
         [HttpGet("user/{aspUserId}/reading/{readingId}/dropdown")]
+        [Authorize]
         public async Task<IActionResult> GetForDropDown([FromRoute] Guid aspUserId, [FromRoute] Guid readingId)
         {
             var userDb = await readerUserService.GetByAspId(aspUserId);

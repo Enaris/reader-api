@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -106,6 +107,7 @@ namespace Reader.API.Controllers
         }
 
         [HttpPost("updateReading")]
+        [Authorize]
         public async Task<IActionResult> UpdateReading([FromForm] ReadingUpdateRequest request)
         {
             var userDb = await readerUserService.GetByAspId(request.AspUserId);
@@ -146,6 +148,7 @@ namespace Reader.API.Controllers
         }
     
         [HttpPost("user/{aspUserId}/delete/{readingId}")]
+        [Authorize]
         public async Task<IActionResult> DeleteReading([FromRoute] Guid aspUserId, [FromRoute] Guid readingId)
         {
             var userDb = await readerUserService.GetByAspId(aspUserId);
