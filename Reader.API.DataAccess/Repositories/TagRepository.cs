@@ -15,12 +15,11 @@ namespace Reader.API.DataAccess.Repositories
         {
         }
 
-        public IQueryable<Tag> GetAll(bool inclReadingTag = false)
+        public IQueryable<Tag> GetAll(bool inclReadingTag = false, Guid? userId = null)
         {
-            var tagsDb = _context.Set<Tag>()
-                .IfAction(inclReadingTag, q => q
-                    .Include(r => r.ReadingTags));
-            return tagsDb;
+            return _context.Set<Tag>()
+                .IfAction(inclReadingTag, q => q.Include(t => t.ReadingTags))
+                .IfAction(userId != null, q => q.Where(t => t.ReaderUserId == userId));
         }
     }
 }

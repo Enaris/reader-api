@@ -66,7 +66,7 @@ namespace Reader.API.Services.Services
 
         public async Task<IEnumerable<TagTableItem>> GetForTable(Guid readerUserId)
         {
-            var tags = await tagRepo.GetAll(true).ToListAsync();
+            var tags = await tagRepo.GetAll(true, readerUserId).ToListAsync();
 
             var neededReadingsIds = new HashSet<Guid>();
             foreach (var t in tags)
@@ -164,31 +164,47 @@ namespace Reader.API.Services.Services
                 .ToListAsync();
             result.Readings = mapper.Map<IEnumerable<ReadingNameAndId>>(tagReadings);
 
-            var tagMeanCpms = new List<double>();
-            var tagMeanWpms = new List<double>();
+            //var tagMeanCpms = new List<double>();
+            //var tagMeanWpms = new List<double>();
+            var tagCpms = new List<double>();
+            var tagWpms = new List<double>();
             foreach (var r in tagReadings)
             {
                 var readingSpeedData = ReadingTextHelper.GetReadingSpeedGraphData(r.ReadingSessions, r.Text);
-                var readingMeanCpm = readingSpeedData.Sets
+                //var readingMeanCpm = readingSpeedData.Sets
+                //    .Where(s => s.SpeedType == "CPM")
+                //    .SelectMany(s => s.Points, (set, point) => point.Cpm)
+                //    .DefaultIfEmpty(-1.0)
+                //    .Average();
+
+                //var readingMeanWpm = readingSpeedData.Sets
+                //    .Where(s => s.SpeedType == "WPM")
+                //    .SelectMany(s => s.Points, (set, point) => point.Wpm)
+                //    .DefaultIfEmpty(-1.0)
+                //    .Average();
+
+                //if (readingMeanCpm != -1)
+                //    tagMeanCpms.Add(readingMeanCpm);
+                //if (readingMeanWpm != -1)
+                //    tagMeanWpms.Add(readingMeanWpm);
+
+                var readingCpms = readingSpeedData.Sets
                     .Where(s => s.SpeedType == "CPM")
-                    .SelectMany(s => s.Points, (set, point) => point.Cpm)
-                    .DefaultIfEmpty(-1.0)
-                    .Average();
+                    .SelectMany(s => s.Points, (set, point) => point.Cpm);
 
-                var readingMeanWpm = readingSpeedData.Sets
+                var readingWpms = readingSpeedData.Sets
                     .Where(s => s.SpeedType == "WPM")
-                    .SelectMany(s => s.Points, (set, point) => point.Wpm)
-                    .DefaultIfEmpty(-1.0)
-                    .Average();
+                    .SelectMany(s => s.Points, (set, point) => point.Wpm);
 
-                if (readingMeanCpm != -1)
-                    tagMeanCpms.Add(readingMeanCpm);
-                if (readingMeanWpm != -1)
-                    tagMeanWpms.Add(readingMeanWpm);
+                if (readingCpms.Any())
+                    tagCpms.AddRange(readingCpms);
+                if (readingWpms.Any())
+                    tagWpms.AddRange(readingWpms);
             }
-            result.MeanCpm = tagMeanCpms.DefaultIfEmpty(-1).Average();
-            result.MeanWpm = tagMeanWpms.DefaultIfEmpty(-1).Average();
-
+            //result.MeanCpm = tagMeanCpms.DefaultIfEmpty(-1).Average();
+            //result.MeanWpm = tagMeanWpms.DefaultIfEmpty(-1).Average();
+            result.MeanCpm = tagCpms.DefaultIfEmpty(-1).Average();
+            result.MeanWpm = tagWpms.DefaultIfEmpty(-1).Average();
             return result;
         }
     }
