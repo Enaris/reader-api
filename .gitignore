@@ -340,5 +340,5 @@ ASALocalRun/
 healthchecksdb
 
 # images 
-Reader.API/Static/Images/Covers
+Reader.API/Static/Images/Covers/*
 !Reader.API/Static/Images/Covers/.gitkeep
