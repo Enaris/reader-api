@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Reader.API.DataAccess.DbModels;
 using Reader.API.DataAccess.Repositories;
@@ -62,9 +63,9 @@ namespace Reader.API.Services.Services
                     userReadings = userReadings.Where(r => r.ReadingTags.Any(dbT => dbT.TagId == searchT));
             }
 
-            var result = await userReadings.ToListAsync();
-
-            return mapper.Map<IEnumerable<ReadingListItem>>(result);
+            return await userReadings
+                .ProjectTo<ReadingListItem>(mapper.ConfigurationProvider)
+                .ToListAsync();
         }
 
         public async Task<ReadingDetails> GetReadingDetails(Guid readerUserId, Guid readingId)
